@@ -21,8 +21,8 @@ def print_solution(vals, program):
 
 def print_best_result(vals, program):
     return '<h2>Sequence finder</h2><br/>No result found before timeout. Best solution so far: ' + \
-           str(program.score) + '<br/>Code: <pre>' + str(program.get_code()) + '</pre>' + get_result_table(vals) + \
-           get_result_table(program.results)
+           str(program.score) + '<br/>Code: <pre>' + str(program.get_code()) + '</pre><br>Expected results:' + get_result_table(vals) + \
+           "<br>Obtained results:" + get_result_table(program.results)
 
 
 def execute(values):
