@@ -17,7 +17,7 @@ def serveStaticResource(resource):
 
 @app.route("/test")
 def test():
-    return "<strong>It's Alive!</strong>"
+    return render_template("sequence_finder/math_sample.html")
 
 
 @app.route("/finder", methods=[ 'GET'])
