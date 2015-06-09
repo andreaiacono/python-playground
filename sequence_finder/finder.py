@@ -15,20 +15,17 @@ def get_result_table(vals):
 
 
 def print_solution(vals, program):
-    return '<h2>Sequence finder</h2><br/>Requested sequence: ' + str(vals) + '</br><br/>Code: <pre>' + str(
-        program.get_code()) + '</pre>' + get_result_table(vals)
+    return '<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full"></script><h2>Sequence finder</h2><br/>Requested sequence: ' \
+           + str(vals) + '</br><br/>Code: `a(n) = ' + str(program.get_code()) + '`<br/>' + get_result_table(vals)
 
 
 def print_best_result(vals, program):
-    return '<h2>Sequence finder</h2><br/>No result found before timeout. Best solution so far: ' + \
-           str(program.score) + '<br/>Code: <pre>' + str(program.get_code()) + '</pre><br>Expected results:' + get_result_table(vals) + \
+    return '<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full"></script><h2>Sequence finder</h2><br/>No result found before timeout. Best solution so far: ' + \
+           str(program.score) + '<br/>Code: `a(n) = ' + str(program.get_code()) + '`<br>Expected results:' + get_result_table(vals) + \
            "<br>Obtained results:" + get_result_table(program.results)
 
 
 def execute(values):
-    n = 2
-    n ^= 2
-    print("starting 2^=2 == " + str(n))
     vals = map(int, values.split(","))
     world = World()
     best_program = world.evolve(vals)

@@ -20,7 +20,7 @@ def test():
     return render_template("sequence_finder/math.html")
 
 
-@app.route("/finder", methods=[ 'GET'])
+@app.route("/finder", methods=['GET'])
 def sequence_finder():
     return render_template("sequence_finder/index.html")
 
