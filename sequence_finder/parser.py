@@ -108,7 +108,7 @@ class NumericStringParser(object):
 
     def eval(self, num_string, parseAll=True):
         self.exprStack = []
-        results = self.bnf.parseString(num_string, parseAll)
+        self.bnf.parseString(num_string, parseAll)
         val = self.evaluateStack(self.exprStack[:])
         return val
 
@@ -117,8 +117,8 @@ class NumericStringParser(object):
     #     self.bnf.parseString(expression, True)
 
 
-# nsp = NumericStringParser()
+nsp = NumericStringParser()
 # # nsp.parse_string('2^4*(sin(2+2))/4')
 # # nsp.parse_string('2+(3*(5-1))')
 # nsp.parse_string('(4+(n/9))')
-# print(nsp.eval('(4+(n/9))'))
+# print(nsp.eval('2+2'))

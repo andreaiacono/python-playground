@@ -1,13 +1,8 @@
-from sequence_finder.parser import NumericStringParser
-
-__author__ = 'andrea'
-
 import random
 import sys
-from string import Template
-from cStringIO import StringIO
-
+from sequence_finder.parser import NumericStringParser
 from sequence_finder import utils
+from string import Template
 
 
 INPUT_NAME = 'n'
@@ -40,8 +35,8 @@ class Program:
 
                 # if utils.prob(1, 5):
                 # # unary
-                #     operand = self.get_random_operand()
-                #     operator = self.get_random_unary_operator()
+                # operand = self.get_random_operand()
+                # operator = self.get_random_unary_operator()
                 # else:
                 self._code = self.get_expression()
                 # print(self._code)
@@ -99,15 +94,27 @@ class Program:
         return "(" + operand1 + "" + operator + "" + operand2 + ")"
 
     def mutate(self):
-        line_index = random.randint(0, len(self._code) - 1)
-        operator, operand = self.get_ops(line_index)
 
-        if random.randint(1, 2) > 1:
-            operand = self.get_random_operand()
-        else:
-            operator = self.get_random_operator()
+        for index in range(0, len(self._code)):
+            if self._code[index] == '(':
+                if utils.prob(1, 5):
+                    self._code = self.remove_parenthesis(self._code, index)
+                    self._code = self._code[:index] + self.get_expression() + self._code[index:]
+                    return
 
-        self._code[line_index] = LINE_TEMPLATE.substitute(input=INPUT_NAME, operator=operator, operand=operand)
+    @staticmethod
+    def remove_parenthesis(expression, index):
+        open_parenthesis = 0
+        for i in range(index, len(expression)):
+            if expression[i] == '(':
+                open_parenthesis += 1
+            if expression[i] == ')':
+                open_parenthesis -= 1
+
+            if open_parenthesis == 0:
+                return expression[:index] + expression[i+1:]
+
+        return expression
 
     def execute_code(self, i):
         code = self._code.replace(INPUT_NAME, str(i))
@@ -130,3 +137,4 @@ class Program:
 
     def __repr__(self):
         return "Program: score=" + str(self.score)
+

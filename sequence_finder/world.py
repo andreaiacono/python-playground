@@ -28,7 +28,6 @@ class World:
         while True:
             evolution_round += 1
             best_index = -1
-            print("bew best index")
             for j in range(0, constants.POPULATION_SIZE):
                 score = 0
                 program = self.population[j]
@@ -37,12 +36,13 @@ class World:
                     partial_result = program.execute_code(i + 1)
                     score += self.get_fitness(vals[i], partial_result)
                     program.add_result(partial_result)
-                    print("Input: " + str(i + 1) + " - Expected output:" + str(vals[i]) + " - Obtained output:" + str(partial_result))
+                    # print("Input: " + str(i + 1) + " - Expected output:" + str(vals[i]) + " - Obtained output:" + str(partial_result))
 
                 program.set_score(score)
-                print("Round " + str(evolution_round) + " - Program #" + str(j) + " - score " + str(score) + " - bestscore: " + str(best_score) + " - bestindex=" + str(best_index ) + " - results=" + str(program.results) + "CODE\n" + program.get_code())
+                # print("Round " + str(evolution_round) + " - Program #" + str(j) + " - score " + str(score) + " - bestscore: " + str(best_score) + " - bestindex=" + str(best_index ) + " - results=" + str(program.results) + "CODE\n" + program.get_code())
 
-                if score < best_score or (score == best_score and len(program.get_code().split("\n")) < len(self.population[best_index].get_code().split("\n"))):
+                if score < best_score or (score == best_score and len(program.get_code().split("\n")) < len(
+                        self.population[best_index].get_code().split("\n"))):
                     best_index = j
                     best_score = score
 
@@ -54,6 +54,7 @@ class World:
                 break
 
             # renew the population according to best scores
+            print("Round " + str(evolution_round) + " finished. Best score: " + str(best_score) + ". Computing new population..")
             self.next_round()
 
         return self.population[best_index]
@@ -62,10 +63,10 @@ class World:
         sorted_population = sorted(self.population, key=lambda p: p.score)
         for i in range(0, constants.BEST_FIT_SIZE):
             program = sorted_population[i]
-            # if utils.prob(1, 3):
-            #     program.mutate()
             if utils.prob(1, 3):
-                sorted_population[i], sorted_population[i+1] = self.crossover(program, sorted_population[i+1])
+                program.mutate()
+            # if utils.prob(1, 3):
+                # sorted_population[i], sorted_population[i + 1] = self.crossover(program, sorted_population[i + 1])
 
     @staticmethod
     def get_fitness(expected_value, obtained_value):
@@ -76,12 +77,23 @@ class World:
         len1 = len(program1.get_code())
         len2 = len(program2.get_code())
 
-        min_len = len1 if len1 < len2 else len2
-        crossover = random.randint(1, min_len)
-        new_code1 = program1._code[0:crossover] + program2._code[crossover:len2-1]
-        new_code2 = program2._code[0:crossover] + program1._code[crossover:len1-1]
-        program1.set_code(new_code1)
-        program2.set_code(new_code2)
+        shorter = program1.get_code() if len1 < len2 else program2.get_code()
+        # for index in range(0, len(program1.get_code())-1):
+        #     if shorter[index] == '(':
+        #         if utils.prob(1, 5):
+        #             index1 = index
+        #
+        # for index in range(0, len(program2.get_code())-1):
+        #     if shorter[index] == '(':
+        #         if utils.prob(1, 5):
+        #             index2 = index
+
+        #
+        #
+        # new_code1 = program1._code[0:crossover] + program2._code[crossover:len2 - 1]
+        # new_code2 = program2._code[0:crossover] + program1._code[crossover:len1 - 1]
+        # program1.set_code(new_code1)
+        # program2.set_code(new_code2)
 
         return [program1, program2]
 

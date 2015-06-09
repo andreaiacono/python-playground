@@ -1,5 +1,3 @@
-__author__ = 'andrea'
-
 import random
 
 def prob(n, m):
