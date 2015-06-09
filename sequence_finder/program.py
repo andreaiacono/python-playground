@@ -2,23 +2,11 @@ import random
 import sys
 from sequence_finder.parser import NumericStringParser
 from sequence_finder import utils
-from string import Template
 
 
 INPUT_NAME = 'n'
-PREFIX = '\t'
 OPERATORS = ['+', '-', '*', '/', '^']
 UNARY_OPERATORS = ['+', '-']
-CODE_TEMPLATE = Template('''
-
-def compute(''' + INPUT_NAME + '''):
-$code
-\treturn ''' + INPUT_NAME + '''
-
-print(compute($input))
-''')
-
-LINE_TEMPLATE = Template(PREFIX + '$input $operator $operand')
 
 
 class Program:
@@ -30,20 +18,7 @@ class Program:
         self.score = sys.maxint
         self.results = []
         self._code = []
-        for line in range(random.randint(1, 5)):
-            while True:
-
-                # if utils.prob(1, 5):
-                # # unary
-                # operand = self.get_random_operand()
-                # operator = self.get_random_unary_operator()
-                # else:
-                self._code = self.get_expression()
-                # print(self._code)
-
-                if utils.prob(1, 8):
-                    break
-
+        self._code = self.get_expression()
         self.nsp = NumericStringParser()
 
     def clear_results(self):
@@ -59,13 +34,11 @@ class Program:
     def get_code(self):
         return self._code
 
+    def get_presentation_code(self):
+        return self._code[1:-1].lower()
+
     def set_code(self, new_code):
         self._code = new_code
-
-    def get_ops(self, index):
-        operand = self._code[index][len(PREFIX):len(PREFIX) + len(INPUT_NAME)]
-        operator = self._code[index][len(PREFIX) + len(INPUT_NAME) + 3:].strip()
-        return [operand, operator]
 
     @staticmethod
     def get_random_operator():
@@ -78,7 +51,13 @@ class Program:
     def get_random_operand(self):
         if utils.prob(1, 2):
             if utils.prob(1, 2):
-                return str(random.randint(0, 10))
+                if utils.prob(1, 4):
+                    return str(random.randint(0, 10))
+                else:
+                    if utils.prob(1, 2):
+                        return "PI"
+                    else:
+                        return "E"
             else:
                 if utils.prob(1, 4):
                     return INPUT_NAME
@@ -94,7 +73,6 @@ class Program:
         return "(" + operand1 + "" + operator + "" + operand2 + ")"
 
     def mutate(self):
-
         for index in range(0, len(self._code)):
             if self._code[index] == '(':
                 if utils.prob(1, 5):
@@ -112,7 +90,7 @@ class Program:
                 open_parenthesis -= 1
 
             if open_parenthesis == 0:
-                return expression[:index] + expression[i+1:]
+                return expression[:index] + expression[i + 1:]
 
         return expression
 
