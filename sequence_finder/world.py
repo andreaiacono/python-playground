@@ -22,12 +22,12 @@ class World:
     def start(self, vals):
         evolution_round = 0
         start = time.time()
+        best_score = sys.maxint
         while True:
-            best_score = sys.maxint
             evolution_round += 1
-            best_index = -1
-            for j in range(0, constants.POPULATION_SIZE):
-                score = 0
+            best_index = 0
+            for j in range(1, constants.POPULATION_SIZE):
+                score = 0.0
                 program = self.population[j]
                 program.clear_results()
                 for i in range(len(vals)):
@@ -49,22 +49,28 @@ class World:
                 break
 
             # renew the population according to best scores
-            print("Round " + str(evolution_round) + " finished. Best score: " + str(
-                best_score) + ". Computing new population.. [" + self.population[
-                      best_index].get_presentation_code() + "]\n")
-            self.population = self.evolve()
+            print("Round " + str(evolution_round) + " finished. Best score: " + str(best_score) + " - Best index: " + str(best_index) +
+                  ". Computing new population.. [" + str(self.population[best_index]) + "]")
+            print self.population
+
+            self.evolve()
 
         return self.population[best_index]
 
     def evolve(self):
         sorted_population = sorted(self.population, key=lambda p: p.score)
+        new_population = [sorted_population[0]]
+        new_population.extend(sorted_population[:-1])
         for i in range(1, constants.BEST_FIT_SIZE):
-            program = sorted_population[i]
             if utils.prob(1, 3):
-                program.mutate()
-                # if utils.prob(1, 3):
-                # sorted_population[i], sorted_population[i + 1] = self.crossover(program, sorted_population[i + 1])
-        return sorted_population
+                new_population[i].mutate()
+            # if utils.prob(1, 3):
+            #     new_population[i], new_population[i + 1] = self.crossover(new_population[i], new_population[i + 1])
+
+        for i in range(constants.BEST_FIT_SIZE, constants.POPULATION_SIZE-1):
+            new_population[i] = Program()
+
+        self.population = new_population
 
     @staticmethod
     def get_fitness(expected_value, obtained_value):

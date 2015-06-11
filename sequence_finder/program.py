@@ -24,13 +24,6 @@ class Program:
     def clear_results(self):
         self.results = []
 
-    def is_useless(self, operator, operand):
-        return (operand == '0' and operator == '+=') \
-               or (operand == '0' and operator == '-=') \
-               or (operand == '1' and operator == '*=') \
-               or (operand == '1' and operator == '/=') \
-               or (operand == INPUT_NAME and operator == '=')
-
     def get_code(self):
         return self._code
 
@@ -49,7 +42,7 @@ class Program:
         return UNARY_OPERATORS[random.randint(0, len(UNARY_OPERATORS) - 1)]
 
     def get_random_operand(self):
-        if utils.prob(1, 2):
+        if utils.prob(5, 5):
             if utils.prob(1, 2):
                 if utils.prob(1, 4):
                     return str(random.randint(0, 10))
@@ -62,7 +55,15 @@ class Program:
                 if utils.prob(1, 4):
                     return INPUT_NAME
                 else:
-                    return "sin" + self.get_expression()
+                    prob = random.randint(0, 3)
+                    if prob == 0:
+                        return "sin" + self.get_expression()
+                    elif prob == 1:
+                        return "cos" + self.get_expression()
+                    elif prob == 2:
+                        return "tan" + self.get_expression()
+                    else:
+                        return "sgn" + self.get_expression()
         else:
             return self.get_expression()
 
@@ -76,13 +77,13 @@ class Program:
         for index in range(0, len(self._code)):
             if self._code[index] == '(':
                 if utils.prob(1, 5):
-                    self._code = self.remove_parenthesis(self._code, index)
+                    self.remove_parenthesis(index)
                     self._code = self._code[:index] + self.get_expression() + self._code[index:]
                     return
 
-    @staticmethod
-    def remove_parenthesis(expression, index):
+    def remove_parenthesis(self, index):
         open_parenthesis = 0
+        expression = self._code
         for i in range(index, len(expression)):
             if expression[i] == '(':
                 open_parenthesis += 1
@@ -90,9 +91,9 @@ class Program:
                 open_parenthesis -= 1
 
             if open_parenthesis == 0:
-                return expression[:index] + expression[i + 1:]
-
-        return expression
+                self._code = expression[:index] + expression[i + 1:]
+                return
+        return
 
     def execute_code(self, i):
         code = self._code.replace(INPUT_NAME, str(i))
@@ -114,5 +115,5 @@ class Program:
         self.results.append(result)
 
     def __repr__(self):
-        return "Program: score=" + str(self.score)
+        return "Program: score=" + str(self.score) + " - Expression=" + self._code
 

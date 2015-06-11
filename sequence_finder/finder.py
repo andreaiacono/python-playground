@@ -34,4 +34,4 @@ def execute(values):
 
     return print_best_result(vals, best_program)
 
-# execute("2,4,8,16")
+execute("2,4,8,16")
