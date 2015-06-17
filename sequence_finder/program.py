@@ -4,7 +4,7 @@ from sequence_finder.parser import NumericStringParser
 from sequence_finder import utils
 
 
-INPUT_NAME = 'n'
+INPUT_NAME = 'N'
 OPERATORS = ['+', '-', '*', '/', '^']
 UNARY_OPERATORS = ['+', '-']
 
@@ -18,11 +18,16 @@ class Program:
         self.score = sys.maxint
         self.results = []
         self._code = []
-        self._code = self.get_expression()
+        while True:
+            self._code = self.create_expression()
+            if INPUT_NAME in self._code:
+                break
+        # print("program: " + str(self))
         self.nsp = NumericStringParser()
 
     def clear_results(self):
         self.results = []
+        self.score = sys.maxint
 
     def get_code(self):
         return self._code
@@ -33,6 +38,38 @@ class Program:
     def set_code(self, new_code):
         self._code = new_code
 
+    def get_random_subexpression(self):
+        parenthesis = []
+        for index in range(1, len(self._code)):
+            if self._code[index] == '(' and self._code[index-1] != 's' and self._code[index-1] != 'n':
+                parenthesis.append(index)
+
+        if len(parenthesis) == 0:
+            return -1, ""
+
+        index = random.choice(parenthesis)
+        print("index=" + str(index))
+        return index, self.get_subexpression_starting_at(index)
+
+    def insert_subexpression_at(self, expression, index):
+        print("called index=" + str(index))
+        self._code = self._code[:index] + expression + self._code[index+1:]
+
+    def get_subexpression_starting_at(self, index):
+        open_parenthesis = 0
+        expression = self._code
+        for i in range(index, len(expression)):
+            if expression[i] == '(':
+                open_parenthesis += 1
+            if expression[i] == ')':
+                open_parenthesis -= 1
+
+            if open_parenthesis == 0:
+                return expression[:index] + expression[i + 1:]
+
+        return expression
+
+
     @staticmethod
     def get_random_operator():
         return OPERATORS[random.randint(0, len(OPERATORS) - 1)]
@@ -42,46 +79,42 @@ class Program:
         return UNARY_OPERATORS[random.randint(0, len(UNARY_OPERATORS) - 1)]
 
     def get_random_operand(self):
-        if utils.prob(5, 5):
-            if utils.prob(1, 2):
-                if utils.prob(1, 4):
-                    return str(random.randint(0, 10))
-                else:
-                    if utils.prob(1, 2):
-                        return "PI"
-                    else:
-                        return "E"
+        if utils.prob(3, 4):
+            if utils.prob(2, 4):
+                return str(random.randint(0, 10))
             else:
-                if utils.prob(1, 4):
-                    return INPUT_NAME
+                if utils.prob(1, 2):
+                    return "PI"
                 else:
-                    prob = random.randint(0, 3)
-                    if prob == 0:
-                        return "sin" + self.get_expression()
-                    elif prob == 1:
-                        return "cos" + self.get_expression()
-                    elif prob == 2:
-                        return "tan" + self.get_expression()
-                    else:
-                        return "sgn" + self.get_expression()
+                    return "E"
         else:
-            return self.get_expression()
+            if utils.prob(1, 4):
+                return INPUT_NAME
+            else:
+                prob = random.randint(0, 2)
+                if prob == 0:
+                    return "sin" + self.create_expression()
+                elif prob == 1:
+                    return "cos" + self.create_expression()
+                else:
+                    return "tan" + self.create_expression()
 
-    def get_expression(self):
-        operator = self.get_random_operator()
-        operand1 = self.get_random_operand()
-        operand2 = self.get_random_operand()
-        return "(" + operand1 + "" + operator + "" + operand2 + ")"
+    def create_expression(self):
+        expression = "(" + self.get_random_operand()
+        for i in range(0, random.randint(0, 4)):
+            expression += self.get_random_operator()
+            expression += self.get_random_operand()
+        return expression + ")"
 
     def mutate(self):
         for index in range(0, len(self._code)):
             if self._code[index] == '(':
                 if utils.prob(1, 5):
-                    self.remove_parenthesis(index)
-                    self._code = self._code[:index] + self.get_expression() + self._code[index:]
+                    self.remove_subexpression(index)
+                    self._code = self._code[:index] + self.create_expression() + self._code[index:]
                     return
 
-    def remove_parenthesis(self, index):
+    def remove_subexpression(self, index):
         open_parenthesis = 0
         expression = self._code
         for i in range(index, len(expression)):

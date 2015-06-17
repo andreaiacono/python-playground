@@ -1,3 +1,5 @@
+import copy
+import random
 import time
 import sys
 
@@ -26,7 +28,7 @@ class World:
         while True:
             evolution_round += 1
             best_index = 0
-            for j in range(1, constants.POPULATION_SIZE):
+            for j in range(0, constants.POPULATION_SIZE):
                 score = 0.0
                 program = self.population[j]
                 program.clear_results()
@@ -50,22 +52,24 @@ class World:
 
             # renew the population according to best scores
             print("Round " + str(evolution_round) + " finished. Best score: " + str(best_score) + " - Best index: " + str(best_index) +
-                  ". Computing new population.. [" + str(self.population[best_index]) + "]")
-            print self.population
+                  ". Computing new population.. [" + str(self.population[best_index]) + "]: " + str(self.population[best_index].score))
+            # print self.population
 
-            self.evolve()
+            self.evolve(best_index)
+            print("New Round " + str(self.population[0]._code))
 
         return self.population[best_index]
 
-    def evolve(self):
+    def evolve(self, best_index):
         sorted_population = sorted(self.population, key=lambda p: p.score)
-        new_population = [sorted_population[0]]
+        new_population = [copy.copy(self.population[best_index])]
         new_population.extend(sorted_population[:-1])
-        for i in range(1, constants.BEST_FIT_SIZE):
+        for i in range(2, constants.BEST_FIT_SIZE):
             if utils.prob(1, 3):
                 new_population[i].mutate()
-            # if utils.prob(1, 3):
-            #     new_population[i], new_population[i + 1] = self.crossover(new_population[i], new_population[i + 1])
+            if utils.prob(1, 3):
+                self.crossover(new_population[i], new_population[i+1])
+            pass
 
         for i in range(constants.BEST_FIT_SIZE, constants.POPULATION_SIZE-1):
             new_population[i] = Program()
@@ -76,28 +80,23 @@ class World:
     def get_fitness(expected_value, obtained_value):
         return abs(expected_value - obtained_value)
 
-    def crossover(self, program1, program2):
+    @staticmethod
+    def crossover(program1, program2):
 
-        len1 = len(program1.get_code())
-        len2 = len(program2.get_code())
+        # print("progr1 =" + program1.get_code() + " progra2=" + program2.get_code())
+        index1, expr1 = program1.get_random_subexpression()
+        index2, expr2 = program2.get_random_subexpression()
+        if index1 == -1 or index2 == -1:
+            return
+        # print("index1=" + str(index1) + " index2=" + str(index2))
 
-        shorter = program1.get_code() if len1 < len2 else program2.get_code()
-        # for index in range(0, len(program1.get_code())-1):
-        # if shorter[index] == '(':
-        #         if utils.prob(1, 5):
-        #             index1 = index
-        #
-        # for index in range(0, len(program2.get_code())-1):
-        #     if shorter[index] == '(':
-        #         if utils.prob(1, 5):
-        #             index2 = index
+        program1.remove_subexpression(index1)
+        program2.remove_subexpression(index2)
+        # print("now index1=" + str(index1) + " index2=" + str(index2))
+        # print("after remove progr1 =" + program1.get_code() + " progra2=" + program2.get_code())
 
-        #
-        #
-        # new_code1 = program1._code[0:crossover] + program2._code[crossover:len2 - 1]
-        # new_code2 = program2._code[0:crossover] + program1._code[crossover:len1 - 1]
-        # program1.set_code(new_code1)
-        # program2.set_code(new_code2)
+        program1.insert_subexpression_at(expr2, index1)
+        program2.insert_subexpression_at(expr1, index2)
+        # print("final progr1 =" + program1.get_code() + " progra2=" + program2.get_code())
 
-        return [program1, program2]
 
