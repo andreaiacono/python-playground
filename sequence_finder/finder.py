@@ -16,7 +16,7 @@ def get_result_table(vals):
 
 def print_solution(vals, program):
     return '<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full"></script><h2>Sequence finder</h2><br/>Requested sequence: ' \
-           + str(vals) + '</br>p<br/>`a(n) = ' + str(program.get_presentation_code()) + '`<br/><br/>' + get_result_table(vals)
+           + str(vals) + '<br/><br/>`a(n) = ' + str(program.get_presentation_code()) + '`<br/><br/>' + get_result_table(vals)
 
 
 def print_best_result(vals, program):
@@ -36,4 +36,4 @@ def execute(values):
 
     return print_best_result(vals, best_program)
 
-# execute("2,4,8,16")
+print execute("1,4,9,16")
