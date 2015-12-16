@@ -5,8 +5,8 @@ import sys
 
 from sequence_finder import constants
 from sequence_finder import utils
-from sequence_finder.program import Program
-
+from sequence_finder.expression import Expression
+from sequence_finder.parser import NumericStringParser
 
 __author__ = 'andrea'
 
@@ -18,8 +18,9 @@ class World:
 
     def __init__(self):
         self.population = []
+        self.nsp = NumericStringParser()
         for i in range(0, constants.POPULATION_SIZE):
-            self.population.append(Program())
+            self.population.append(Expression(self.nsp))
 
     def start(self, vals):
         evolution_round = 0
@@ -56,7 +57,7 @@ class World:
             # print self.population
 
             self.evolve(best_index)
-            print("New Round " + str(self.population[0]._code))
+            print("New Round " + str(self.population[0].get_expression()))
 
         return self.population[best_index]
 
@@ -72,7 +73,7 @@ class World:
             pass
 
         for i in range(constants.BEST_FIT_SIZE, constants.POPULATION_SIZE-1):
-            new_population[i] = Program()
+            new_population[i] = Expression(self.nsp)
 
         self.population = new_population
 
